@@ -14,6 +14,7 @@ class IndexController extends Controller
         $signature = $request->input("signature");
         $timestamp = $request->input("timestamp");
         $nonce = $request->input("nonce");
+        $echostr=$request->input("echostr");
 
         $token = getenv('WXCHECK_TOKEN');
         $tmpArr = array($token, $timestamp, $nonce);
@@ -22,9 +23,9 @@ class IndexController extends Controller
         $tmpStr = sha1($tmpStr);
 
         if ($tmpStr == $signature) {
-            return true;
+            return $echostr;
         } else {
-            return false;
+            return 0;
         }
     }
 }
