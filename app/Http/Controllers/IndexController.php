@@ -41,9 +41,9 @@ class IndexController extends Controller
                 $temp_table = DB::table('wx_chat_user');
                 $temp_data = $temp_table->where('useropenid', $temp_array->FromUserName)->get()->toArray();
                 if ($temp_data) {
-                    $temp_table->where('id', $temp_data[0]->id)->update(['finalchattime' => time(), 'finalchatnum' => 1]);
+                    $temp_table->where('id', $temp_data[0]->id)->update(['finalchattime' => time(), 'finalchatnum' => 0]);
                 } else {
-                    $temp_table->insert(['useropenid' => $temp_array->FromUserName, 'createtime' => time(), 'finalchattime' => time(), 'finalchatnum' => 1]);
+                    $temp_table->insert(['useropenid' => $temp_array->FromUserName, 'createtime' => time(), 'finalchattime' => time(), 'finalchatnum' => 0]);
                 }
 //                事件无msgid
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
@@ -55,11 +55,23 @@ class IndexController extends Controller
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType, 'msgid' => $temp_array->MsgId]);
                 DB::table('wx_temp_save_text')->insert(['content' => $temp_array->Content, 'chat_id' => $id]);
+                $temp_data = DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->get()->toArray();
+                if($temp_data[0]['finalchatnum']==0){
+//                    第一次说话
+                    $this->sendMessage( $temp_array->FromUserName,'text','收到您的消息，准备为您分配客服，输入查询回复当前排队状况');
+                }
+                DB::table('wx_chat_user')->where('id', $temp_data[0]->id)->update([ 'finalchatnum' => 1]);
             }
             if ($temp_array->MsgType == 'text') {
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType, 'msgid' => $temp_array->MsgId]);
                 DB::table('wx_temp_save_img')->insert(['picurl' => $temp_array->PicUrl, 'mediaid' => $temp_array->MediaId, 'chat_id' => $id]);
+                $temp_data = DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->get()->toArray();
+                if($temp_data[0]['finalchatnum']==0){
+//                    第一次说话
+                    $this->sendMessage( $temp_array->FromUserName,'text','收到您的消息，准备为您分配客服，输入查询回复当前排队状况');
+                }
+                DB::table('wx_chat_user')->where('id', $temp_data[0]->id)->update([ 'finalchatnum' => 1]);
             }
         } else {
 //            没有信息返回，等待下次发送
