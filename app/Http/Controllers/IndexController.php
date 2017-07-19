@@ -50,6 +50,7 @@ class IndexController extends Controller
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType]);
                 DB::table('wx_temp_save_event')->insert(['sessionfrom' => $temp_array->SessionFrom, 'event' => $temp_array->Event, 'chat_id' => $id]);
+                $this->sendWelcome($temp_array->FromUserName);
             }
             if ($temp_array->MsgType == 'text') {
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
@@ -92,20 +93,70 @@ class IndexController extends Controller
     public function sendMessage($touser, $msgtype, $data)
     {
         if ($msgtype == 'text') {
-
+            $data = array(
+                'touser' => $touser,
+                'msgtype' => 'text',
+                "text" => array(
+                    'content' => $data
+                )
+            );
         } else if ($msgtype == 'image') {
-
+            $data = array(
+                'touser' => $touser,
+                'msgtype' => 'image',
+                "image" => array(
+                    'media_id' => $data
+                )
+            );
         } else if ($msgtype == 'link') {
-            
+            $data = array(
+                'touser' => $touser,
+                'msgtype' => 'link',
+                "link" => array(
+                    "title" => "Happy Day",
+                    "description" => "Is Really A Happy Day",
+                    "url" => "URL",
+                    "thumb_url" => "THUMB_URL"
+                )
+            );
         }
         $url = getenv('WX_KF_SEND_URL');
-
+        $this->curlPost($url, $data, 10);
     }
 
-    private function sendWelcome()
+    private function sendWelcome($touser)
     {
 //        调用此欢迎
-
-
+        $this->sendMessage($touser, 'text', '欢迎联系');
     }
+
+    //post请求
+    public function curlPost($url, $request, $timeout = 5)
+    {
+        $con = curl_init((string)$url);
+        curl_setopt($con, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($con, CURLOPT_HEADER, false);
+        curl_setopt($con, CURLOPT_POSTFIELDS, http_build_query($request));
+        file_put_contents("temp_chat.log", "This is post." . http_build_query($request) . PHP_EOL, FILE_APPEND);
+        curl_setopt($con, CURLOPT_POST, true);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($con, CURLOPT_TIMEOUT, (int)$timeout);
+        $output = curl_exec($con);
+        file_put_contents("temp_chat.log", "This is postReturn." . json_encode($output) . PHP_EOL, FILE_APPEND);
+        return json_decode($output, true);
+    }
+
+    //get请求
+    public function curlGet($url, $data, $timeout = 5)
+    {
+        //初始化
+        $url = $url . '?' . http_build_query($data);
+        $con = curl_init((string)$url);
+        curl_setopt($con, CURLOPT_HEADER, false);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($con, CURLOPT_TIMEOUT, (int)$timeout);
+        $output = curl_exec($con);
+        return $output;
+    }
+
 }
