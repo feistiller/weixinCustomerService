@@ -28,4 +28,11 @@ class IndexController extends Controller
             return 0;
         }
     }
+
+//    保存对话
+    public function saveChat(Request $request){
+        $req=$request->all();
+        file_put_contents("temp_chat.log", "This is all.".json_encode($req).PHP_EOL, FILE_APPEND);
+        return 'success';
+    }
 }

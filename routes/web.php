@@ -12,6 +12,7 @@
 */
 
 Route::get('/checkToken', 'IndexController@checkToken');
-Route::get('/',function(){
-   echo "It's worked";
+Route::post('/checkToken', 'IndexController@saveChat');
+Route::get('/', function () {
+    echo "It's worked";
 });
