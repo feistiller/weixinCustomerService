@@ -11,4 +11,7 @@
 |
 */
 
-Route::get('/', 'IndexController@checkToken');
+Route::get('/checkToken', 'IndexController@checkToken');
+Route::get('/',function(){
+   echo "It's worked";
+});
