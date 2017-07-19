@@ -135,8 +135,8 @@ class IndexController extends Controller
         $con = curl_init((string)$url);
         curl_setopt($con, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($con, CURLOPT_HEADER, false);
-        curl_setopt($con, CURLOPT_POSTFIELDS, http_build_query($request));
-        file_put_contents("temp_chat.log", "This is post." . http_build_query($request) . PHP_EOL, FILE_APPEND);
+        curl_setopt($con, CURLOPT_POSTFIELDS, json_encode($request));
+        file_put_contents("temp_chat.log", "This is post." . json_encode($request) . PHP_EOL, FILE_APPEND);
         curl_setopt($con, CURLOPT_POST, true);
         curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($con, CURLOPT_TIMEOUT, (int)$timeout);
