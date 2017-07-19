@@ -40,7 +40,6 @@ class IndexController extends Controller
             if ($temp_array->MsgType == 'event') {
                 $temp_table = DB::table('wx_chat_user');
                 $temp_data = $temp_table->where('useropenid', $temp_array->FromUserName)->get()->toArray();
-                var_dump($temp_data);
                 if ($temp_data) {
                     $temp_table->where('id', $temp_data[0]->id)->update(['finalchattime' => time(), 'finalchatnum' => 1]);
                 } else {
