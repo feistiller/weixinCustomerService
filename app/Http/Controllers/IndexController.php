@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
 
 class IndexController extends Controller
 {
 //    验证token
-    public function checkToken()
+    public function checkToken(Request $request)
     {
-        $signature = $_GET["signature"];
-        $timestamp = $_GET["timestamp"];
-        $nonce = $_GET["nonce"];
+        $signature = $request->input("signature");
+        $timestamp = $request->input("timestamp");
+        $nonce = $request->input("nonce");
 
         $token = getenv('WXCHECK_TOKEN');
         $tmpArr = array($token, $timestamp, $nonce);
