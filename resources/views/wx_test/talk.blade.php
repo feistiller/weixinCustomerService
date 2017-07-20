@@ -33,7 +33,8 @@
 
 <script>
     $(document).ready(function () {
-        getUserTalk()
+        setInterval(getUserTalk,5000)
+
     })
     function GetQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
