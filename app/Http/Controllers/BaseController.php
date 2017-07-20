@@ -12,14 +12,14 @@ class BaseController extends Controller
 
 
 //    发送信息（未加密）
-    public function sendMessage($touser, $msgtype, $data)
+    public function sendMessage($touser, $msgtype, $content)
     {
         if ($msgtype == 'text') {
             $data = array(
                 'touser' => $touser,
                 'msgtype' => 'text',
                 "text" => array(
-                    'content' => $data
+                    'content' => $content
                 )
             );
         } else if ($msgtype == 'image') {
@@ -27,7 +27,7 @@ class BaseController extends Controller
                 'touser' => $touser,
                 'msgtype' => 'image',
                 "image" => array(
-                    'media_id' => $data
+                    'media_id' => $content
                 )
             );
         } else if ($msgtype == 'link') {
@@ -45,7 +45,8 @@ class BaseController extends Controller
         $url = getenv('WX_KF_SEND_URL');
         $token = $this->getAccess_token();
         $this->log('debug', $token, 'This is token:');
-        $url=$url.$token;
+        $this->chatLog($touser, $content, '客服:');
+        $url = $url . $token;
         $this->curlPost($url, $data, 10);
     }
 
@@ -109,6 +110,13 @@ class BaseController extends Controller
         $date = date("Y-m-d", time());
         $time = date("Y-m-d h:i:sa", time());
         file_put_contents('log/' . $date . $name . '.log', $time . $data_before . json_encode($data, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+    }
+
+    //    简单聊天日志方法
+    public function chatLog($name, $data, $data_before = '')
+    {
+        $time = date("Y-m-d h:i:s", time());
+        file_put_contents('log/UserChat/' . $name . '.log', $time.'&nbsp&nbsp&nbsp' . $data_before . $data .'</br>'. PHP_EOL, FILE_APPEND);
     }
 
 }

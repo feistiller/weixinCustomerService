@@ -50,6 +50,7 @@ class IndexController extends BaseController
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType]);
                 DB::table('wx_temp_save_event')->insert(['sessionfrom' => $temp_array->SessionFrom, 'event' => $temp_array->Event, 'chat_id' => $id]);
                 $this->sendWelcome($temp_array->FromUserName);
+                $this->chatLog($temp_array->FromUserName,'进入聊天','用户:');
             }
             if ($temp_array->MsgType == 'text') {
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
@@ -61,6 +62,7 @@ class IndexController extends BaseController
                     $this->sendMessage( $temp_array->FromUserName,'text','收到您的消息，准备为您分配客服，输入查询回复当前排队状况');
                 }
                 DB::table('wx_chat_user')->where('id', $temp_data[0]->id)->update([ 'finalchatnum' => 1]);
+                $this->chatLog($temp_array->FromUserName,$temp_array->Content,'用户:');
             }
             if ($temp_array->MsgType == 'img') {
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
@@ -81,24 +83,7 @@ class IndexController extends BaseController
         return 'success';
     }
 
-    public function showChats()
-    {
-//        显示所有的对话列表
-        $data = DB::table('wx_chat_user')->get();
-        foreach ($data as $k => $v) {
-//            limit by 48 hours
-            if ((int)$v->finalchattime + 172800 < time()) {
-                if ((int)$v->finalchatnum < 5) {
-                    $data[$k]['status'] = "可对话";
-                } else {
-                    $data[$k]['status'] = "达到系统最大等待玩家回复";
-                }
-            } else {
-                $data[$k]['status'] = "对话已到期";
-            }
-        }
-        return view('wx_test.list', ['data' => $data]);
-    }
+
 
 
 
