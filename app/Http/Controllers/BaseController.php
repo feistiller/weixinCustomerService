@@ -50,6 +50,26 @@ class BaseController extends Controller
         $this->curlPost($url, $data, 10);
     }
 
+    //    介入机器人
+    public function talk2Robot($useropenid, $content)
+    {
+        $url = getenv('ROBOT_URL');
+        $key = getenv('ROBOT_KEY');
+        $data = array(
+            "key" => $key,
+            'info' => $content,
+            'userid' => $useropenid
+        );
+        $return =$this->curlPost($url, $data, 10);
+        if ($return['code'] == 100000) {
+            $this->sendMessage($useropenid, 'text', $return['text']);
+        } else if ($return['code']  == 200000) {
+            $this->sendMessage($useropenid, 'text', $return['text'] . "地址:" . $return['url']);
+        } else {
+            $this->sendMessage($useropenid, 'text', "暂未支持");
+        }
+    }
+
 //    获得有期限的token并且记录一定的时间
     private function getAccess_token()
     {
@@ -75,12 +95,14 @@ class BaseController extends Controller
         $con = curl_init((string)$url);
         curl_setopt($con, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($con, CURLOPT_HEADER, false);
-        curl_setopt($con, CURLOPT_POSTFIELDS, json_encode($request, JSON_UNESCAPED_UNICODE));
+        curl_setopt($con, CURLOPT_POSTFIELDS, http_build_query($request));
         $this->log('curl', $url, 'This is postURL:');
         $this->log('curl', $request, 'This is post:');
         curl_setopt($con, CURLOPT_POST, true);
         curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($con, CURLOPT_TIMEOUT, (int)$timeout);
+        curl_setopt($con, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+        curl_setopt($con, CURLOPT_FOLLOWLOCATION, true);
         $output = curl_exec($con);
         $this->log('curl', $output, 'This is postReturn:');
         return json_decode($output, true);
@@ -116,7 +138,7 @@ class BaseController extends Controller
     public function chatLog($name, $data, $data_before = '')
     {
         $time = date("Y-m-d h:i:s", time());
-        file_put_contents('log/UserChat/' . $name . '.log', $time.'&nbsp&nbsp&nbsp' . $data_before . $data .'</br>'. PHP_EOL, FILE_APPEND);
+        file_put_contents('log/UserChat/' . $name . '.log', $time . '&nbsp&nbsp&nbsp' . $data_before . $data . '</br>' . PHP_EOL, FILE_APPEND);
     }
 
 }

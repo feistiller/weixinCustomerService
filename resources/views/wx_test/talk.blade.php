@@ -34,7 +34,6 @@
 <script>
     $(document).ready(function () {
         setInterval(getUserTalk,5000)
-
     })
     function GetQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
