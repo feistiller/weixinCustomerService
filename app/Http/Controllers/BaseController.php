@@ -96,7 +96,7 @@ class BaseController extends Controller
         curl_setopt($con, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($con, CURLOPT_HEADER, false);
         if ($status == 0) {
-            curl_setopt($con, CURLOPT_POSTFIELDS, json_encode($request));
+            curl_setopt($con, CURLOPT_POSTFIELDS, json_encode($request,JSON_UNESCAPED_UNICODE));
         } else {
             curl_setopt($con, CURLOPT_POSTFIELDS, http_build_query($request));
             curl_setopt($con, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
