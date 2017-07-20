@@ -56,7 +56,7 @@ class IndexController extends BaseController
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType, 'msgid' => $temp_array->MsgId]);
                 DB::table('wx_temp_save_text')->insert(['content' => $temp_array->Content, 'chat_id' => $id]);
                 $temp_data = DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->get()->toArray();
-                if($temp_data[0]->finalchatnum==1){
+                if($temp_data[0]->finalchatnum==0){
 //                    第一次说话
                     $this->sendMessage( $temp_array->FromUserName,'text','收到您的消息，准备为您分配客服，输入查询回复当前排队状况');
                 }
