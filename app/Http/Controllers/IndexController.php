@@ -56,7 +56,7 @@ class IndexController extends BaseController
             if ($temp_array->MsgType == 'text') {
                 if ($temp_array->Content == "人工客服") {
                     DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->update(['robot' => 1]);
-                    $this->sendMessage($temp_array->FromUserName, 'text', '正在转接人工客服，输入"排队时间"查询排队状况');
+                    $this->sendMessage($temp_array->FromUserName, 'text', '正在转接人工客服，输入"排队时间"查询排队状况，输入"机器人客服"回转机器人');
                 } elseif ($temp_array->Content == "排队时间") {
                     $this->sendMessage($temp_array->FromUserName, 'text', '前方还有1人在排队');
                 } elseif ($temp_array->Content == "机器人客服") {
