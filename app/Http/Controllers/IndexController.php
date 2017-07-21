@@ -56,17 +56,26 @@ class IndexController extends BaseController
             if ($temp_array->MsgType == 'text') {
                 if ($temp_array->Content == "人工客服") {
                     DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->update(['robot' => 1]);
+                    $this->sendMessage($temp_array->FromUserName, 'text', '正在转接人工客服，输入"排队时间"查询排队状况');
+                } elseif ($temp_array->Content == "排队时间") {
+                    $this->sendMessage($temp_array->FromUserName, 'text', '前方还有1人在排队');
+                } elseif ($temp_array->Content == "机器人客服") {
+                    DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->update(['robot' => 0]);
                 }
                 $id = DB::table('wx_temp_save_chat')->insertGetId(['time' => time(), 'tousername' => $temp_array->ToUserName, 'fromusername' => $temp_array->FromUserName,
                     'createtime' => $temp_array->CreateTime, 'msgtype' => $temp_array->MsgType, 'msgid' => $temp_array->MsgId]);
                 DB::table('wx_temp_save_text')->insert(['content' => $temp_array->Content, 'chat_id' => $id]);
                 $temp_data = DB::table('wx_chat_user')->where('useropenid', $temp_array->FromUserName)->get()->toArray();
-                if ($temp_data[0]->finalchatnum == 0) {
-//                    第一次说话
-                    $this->sendMessage($temp_array->FromUserName, 'text', '收到您的消息，请输入您的问题');
-                } else if ($temp_data[0]->robot == 0) {
+//                暂时不开启第一次问问题的回复
+//                if ($temp_data[0]->finalchatnum == 0) {
+////                    第一次说话
+//                    $this->sendMessage($temp_array->FromUserName, 'text', '收到您的消息，请输入您的问题');
+//                } else
+                if ($temp_data[0]->robot == 0) {
 //                    机器人回复
-                    $this->talk2Robot($temp_array->FromUserName,$temp_array->Content);
+                    $this->talk2Robot($temp_array->FromUserName, $temp_array->Content);
+                } else {
+                    $this->sendMessage($temp_array->FromUserName, 'text', '客服收到您的消息');
                 }
                 DB::table('wx_chat_user')->where('id', $temp_data[0]->id)->update(['finalchatnum' => 1]);
                 $this->chatLog($temp_array->FromUserName, $temp_array->Content, '用户:');
@@ -89,8 +98,6 @@ class IndexController extends BaseController
 //        file_put_contents("temp_chat.log", "This is all.".json_encode($req).PHP_EOL, FILE_APPEND);
         return 'success';
     }
-
-
 
 
     private function sendWelcome($touser)
