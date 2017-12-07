@@ -9,6 +9,6 @@
 
 > 需要在.env中增加自己的机器人和access_token的获取配置信息
 
-### License
+### 开源许可证
 ---
-The Laravel framework is open-sourced software licensed under the MIT license
+[MIT](https://opensource.org/licenses/MIT) license
