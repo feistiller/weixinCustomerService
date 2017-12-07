@@ -8,3 +8,7 @@
 - 可以使用简单的输入文字的方式在界面上进行回复聊天
 
 > 需要在.env中增加自己的机器人和access_token的获取配置信息
+
+### License
+---
+The Laravel framework is open-sourced software licensed under the MIT license
